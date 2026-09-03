@@ -14,6 +14,7 @@ function setup(overrides?: Partial<ReturnType<typeof initialCharacter>>) {
       traits={char.traits}
       vitals={char.vitals}
       thresholds={char.thresholds}
+      conditions={char.conditions}
       level={char.identity.level}
       update={update}
       applyStandardArray={vi.fn()}

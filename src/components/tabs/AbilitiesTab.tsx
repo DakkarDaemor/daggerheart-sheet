@@ -1,7 +1,7 @@
 import { DOMAINS } from "../../data/gameData.js";
 import { nextId } from "../../character.js";
 import { AutoTextarea, Field, Section } from "../UI.js";
-import type { Character, DomainCard, Experience, Identity, UpdateFn } from "../../types.js";
+import type { Character, DomainCard, DomainCardLocation, Experience, Identity, UpdateFn } from "../../types.js";
 import type { Strings } from "../../i18n.js";
 
 export function AbilitiesTab({
@@ -31,10 +31,18 @@ export function AbilitiesTab({
       char.experiences.map((e) => (e.id === id ? { ...e, [field]: value } : e))
     );
 
-  const addDomainCard = () =>
+  const addDomainCard = (location: DomainCardLocation) =>
     update("domainCards", [
       ...char.domainCards,
-      { id: nextId(), name: "", domain: domainOptions[0] || DOMAINS[0] || "", level: 1, recall: 0, description: "" },
+      {
+        id: nextId(),
+        name: "",
+        domain: domainOptions[0] || DOMAINS[0] || "",
+        level: 1,
+        recall: 0,
+        description: "",
+        location,
+      },
     ]);
   const removeDomainCard = (id: string) => {
     if (!window.confirm(t.confirmRemoveItem)) return;
@@ -48,6 +56,64 @@ export function AbilitiesTab({
       "domainCards",
       char.domainCards.map((c) => (c.id === id ? { ...c, [field]: value } : c))
     );
+  const moveDomainCard = (id: string, location: DomainCardLocation) => editDomainCard(id, "location", location);
+
+  const loadoutCards = char.domainCards.filter((c) => c.location === "loadout");
+  const vaultCards = char.domainCards.filter((c) => c.location === "vault");
+
+  const renderDomainCard = (card: DomainCard) => (
+    <div className="list-row" key={card.id}>
+      <div className="grid2">
+        <Field label={t.cardName} wide>
+          <input value={card.name} onChange={(e) => editDomainCard(card.id, "name", e.target.value)} />
+        </Field>
+        <Field label={t.cardDomain}>
+          <select value={card.domain} onChange={(e) => editDomainCard(card.id, "domain", e.target.value)}>
+            {DOMAINS.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </select>
+        </Field>
+        <Field label={t.cardLevel}>
+          <input
+            type="number"
+            min="1"
+            max="10"
+            value={card.level}
+            onChange={(e) => editDomainCard(card.id, "level", Number(e.target.value))}
+          />
+        </Field>
+        <Field label={t.cardRecall}>
+          <input
+            type="number"
+            min="0"
+            value={card.recall}
+            onChange={(e) => editDomainCard(card.id, "recall", Number(e.target.value))}
+          />
+        </Field>
+        <Field label={t.cardDesc} wide>
+          <AutoTextarea
+            className="tall"
+            value={card.description}
+            onChange={(e) => editDomainCard(card.id, "description", e.target.value)}
+          />
+        </Field>
+      </div>
+      <div className="list-row-side">
+        <button
+          className="small-btn"
+          onClick={() => moveDomainCard(card.id, card.location === "loadout" ? "vault" : "loadout")}
+        >
+          {card.location === "loadout" ? t.moveToVault : t.moveToLoadout}
+        </button>
+        <button className="remove-x" onClick={() => removeDomainCard(card.id)} aria-label={t.remove}>
+          ×
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -95,52 +161,18 @@ export function AbilitiesTab({
       </Section>
 
       <Section title={t.domainCards} accent="var(--fear)">
-        {char.domainCards.map((card) => (
-          <div className="list-row" key={card.id}>
-            <div className="grid2">
-              <Field label={t.cardName} wide>
-                <input value={card.name} onChange={(e) => editDomainCard(card.id, "name", e.target.value)} />
-              </Field>
-              <Field label={t.cardDomain}>
-                <select value={card.domain} onChange={(e) => editDomainCard(card.id, "domain", e.target.value)}>
-                  {DOMAINS.map((d) => (
-                    <option key={d} value={d}>
-                      {d}
-                    </option>
-                  ))}
-                </select>
-              </Field>
-              <Field label={t.cardLevel}>
-                <input
-                  type="number"
-                  min="1"
-                  max="10"
-                  value={card.level}
-                  onChange={(e) => editDomainCard(card.id, "level", Number(e.target.value))}
-                />
-              </Field>
-              <Field label={t.cardRecall}>
-                <input
-                  type="number"
-                  min="0"
-                  value={card.recall}
-                  onChange={(e) => editDomainCard(card.id, "recall", Number(e.target.value))}
-                />
-              </Field>
-              <Field label={t.cardDesc} wide>
-                <AutoTextarea
-                  className="tall"
-                  value={card.description}
-                  onChange={(e) => editDomainCard(card.id, "description", e.target.value)}
-                />
-              </Field>
-            </div>
-            <button className="remove-x" onClick={() => removeDomainCard(card.id)} aria-label={t.remove}>
-              ×
-            </button>
-          </div>
-        ))}
-        <button className="ghost-btn" onClick={addDomainCard}>
+        <h3 className="section-title">{t.domainCardsLoadout}</h3>
+        <p className="hint">{t.loadoutHint}</p>
+        {loadoutCards.map(renderDomainCard)}
+        <button className="ghost-btn" onClick={() => addDomainCard("loadout")}>
+          {t.addCard}
+        </button>
+
+        <h3 className="section-title" style={{ marginTop: 16 }}>
+          {t.domainCardsVault}
+        </h3>
+        {vaultCards.map(renderDomainCard)}
+        <button className="ghost-btn" onClick={() => addDomainCard("vault")}>
           {t.addCard}
         </button>
       </Section>

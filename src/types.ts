@@ -67,6 +67,8 @@ export interface Experience {
   mod: number;
 }
 
+export type DomainCardLocation = "loadout" | "vault";
+
 export interface DomainCard {
   id: string;
   name: string;
@@ -74,6 +76,13 @@ export interface DomainCard {
   level: number;
   recall: number;
   description: string;
+  location: DomainCardLocation;
+}
+
+export interface Conditions {
+  hidden: boolean;
+  restrained: boolean;
+  vulnerable: boolean;
 }
 
 export interface Character {
@@ -81,6 +90,7 @@ export interface Character {
   traits: Traits;
   vitals: Vitals;
   thresholds: Thresholds;
+  conditions: Conditions;
   weapons: Weapons;
   armorItem: ArmorItem;
   inventory: string;

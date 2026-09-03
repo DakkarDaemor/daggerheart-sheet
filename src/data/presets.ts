@@ -72,6 +72,7 @@ export const PRESETS: Preset[] = [
           recall: 0,
           description:
             "Attacco riuscito in Very Close: spendi Speranza per colpire anche gli altri bersagli in Very Close (danno dimezzato su questi).",
+          location: "loadout",
         },
         {
           id: "khari-c2",
@@ -81,6 +82,7 @@ export const PRESETS: Preset[] = [
           recall: 1,
           description:
             "Se un alleato in Very Close subirebbe danno, segna Stress per diventare tu il bersaglio; puoi segnare Slot Armatura per il danno ricevuto.",
+          location: "loadout",
         },
       ],
     },
@@ -147,6 +149,7 @@ export const PRESETS: Preset[] = [
           level: 1,
           recall: 0,
           description: "Bonus alla Schivata pari alla metà della tua Agilità.",
+          location: "loadout",
         },
         {
           id: "varian-c2",
@@ -156,6 +159,7 @@ export const PRESETS: Preset[] = [
           recall: 1,
           description:
             "Prova di Lancio Incantesimi (Instinct) a portata Far: successo = 1d8+1 danno fisico e Restrain al bersaglio; spendi Speranza per Restrain anche un secondo avversario vicino.",
+          location: "loadout",
         },
       ],
     },
@@ -223,6 +227,7 @@ export const PRESETS: Preset[] = [
           recall: 0,
           description:
             "Vantaggio su prove per scassinare serrature non magiche, disinnescare trappole non magiche o rubare oggetti (con furtività o forza).",
+          location: "loadout",
         },
         {
           id: "barnacle-c2",
@@ -232,6 +237,7 @@ export const PRESETS: Preset[] = [
           recall: 1,
           description:
             "Dopo un riposo lungo ottieni gettoni pari alla tua Presenza. Parlando con un alleato puoi spenderne uno per fargli eliminare uno Stress, curare un PF, o guadagnare Speranza.",
+          location: "loadout",
         },
       ],
     },
@@ -299,6 +305,7 @@ export const PRESETS: Preset[] = [
           recall: 1,
           description:
             "A inizio sessione ottieni gettoni pari al tuo tratto di Lancio Incantesimi. Prova di Lancio Incantesimi a portata Far: spendi gettoni per tirare altrettanti d10 di danno magico; segna Stress per ricaricare un gettone.",
+          location: "loadout",
         },
         {
           id: "marlowe-c2",
@@ -308,6 +315,7 @@ export const PRESETS: Preset[] = [
           recall: 1,
           description:
             "Spendi Speranza per una Prova di Lancio Incantesimi: lame volanti colpiscono tutti i bersagli in Very Close (1d8+2 danno magico × Competenza, +1d8 extra su bersagli Vulnerable).",
+          location: "loadout",
         },
       ],
     },
@@ -373,6 +381,7 @@ export const PRESETS: Preset[] = [
           level: 1,
           recall: 1,
           description: "Sui dadi danno puoi ritirare qualsiasi 1 o 2.",
+          location: "loadout",
         },
         {
           id: "garrick-c2",
@@ -382,6 +391,7 @@ export const PRESETS: Preset[] = [
           recall: 1,
           description:
             "Se sei bersaglio di un attacco da oltre Melee, segna Stress per tirare un d4 e aggiungerlo alla tua Schivata contro quell'attacco.",
+          location: "loadout",
         },
       ],
     },

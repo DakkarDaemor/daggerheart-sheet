@@ -34,6 +34,7 @@ export function DaggerheartSheet() {
     loadCharacter,
     loadPreset,
     deleteCharacter,
+    duplicateCharacter,
     applyStandardArray,
     exportCurrent,
     exportSaved,
@@ -142,6 +143,9 @@ export function DaggerheartSheet() {
                 <button className="small-btn accent" onClick={() => loadCharacter(entry.id)}>
                   {t.open}
                 </button>
+                <button className="small-btn" onClick={() => duplicateCharacter(entry.id)}>
+                  {t.duplicateBtn}
+                </button>
                 <button className="small-btn" onClick={() => exportSaved(entry.id)}>
                   {t.exportBtn}
                 </button>
@@ -201,6 +205,7 @@ export function DaggerheartSheet() {
           traits={traits}
           vitals={vitals}
           thresholds={thresholds}
+          conditions={char.conditions}
           level={identity.level}
           update={update}
           applyStandardArray={applyStandardArray}

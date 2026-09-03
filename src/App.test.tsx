@@ -63,4 +63,47 @@ describe("DaggerheartSheet", () => {
     expect(alertSpy).toHaveBeenCalledWith("Il file scelto non è una scheda personaggio Daggerheart valida.");
     alertSpy.mockRestore();
   });
+
+  it("toggles an active condition", async () => {
+    render(<DaggerheartSheet />);
+    await userEvent.click(screen.getByRole("button", { name: "Tratti & Vitali" }));
+
+    const vulnerableBtn = screen.getByRole("button", { name: "Vulnerabile" });
+    expect(vulnerableBtn).not.toHaveClass("active");
+
+    await userEvent.click(vulnerableBtn);
+    expect(vulnerableBtn).toHaveClass("active");
+
+    await userEvent.click(vulnerableBtn);
+    expect(vulnerableBtn).not.toHaveClass("active");
+  });
+
+  it("adds domain cards to Loadout and Vault separately, and moves a card between them", async () => {
+    render(<DaggerheartSheet />);
+    await userEvent.click(screen.getByRole("button", { name: "Abilità & Domini" }));
+    const addButtons = () => screen.getAllByRole("button", { name: "+ Aggiungi carta" });
+
+    await userEvent.click(addButtons()[0]!); // + Loadout
+    expect(screen.getByRole("button", { name: "→ Vault" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "→ Loadout" })).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole("button", { name: "→ Vault" }));
+    expect(screen.getByRole("button", { name: "→ Loadout" })).toBeInTheDocument();
+
+    await userEvent.click(addButtons()[1]!); // + Vault
+    expect(screen.getAllByRole("button", { name: "→ Loadout" })).toHaveLength(2);
+  });
+
+  it("duplicates a saved character without touching the one currently open", async () => {
+    render(<DaggerheartSheet />);
+    await userEvent.type(screen.getByLabelText("Nome"), "Original Hero");
+    await userEvent.click(screen.getByRole("button", { name: "Salva" }));
+    await userEvent.click(screen.getByRole("button", { name: "Carica" }));
+
+    const row = screen.getByText("Original Hero").closest(".load-item") as HTMLElement;
+    await userEvent.click(within(row).getByRole("button", { name: "Duplica" }));
+
+    expect(await screen.findByText("Original Hero (copia)")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("Original Hero")).toBeInTheDocument();
+  });
 });

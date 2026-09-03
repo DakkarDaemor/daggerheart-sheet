@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TRAITS, STANDARD_ARRAY_VALUES } from "../data/gameData.js";
 import { INDEX_KEY, LAST_OPENED_KEY, charKey, storageGet, storageSet, storageDelete, deepClone } from "../storage.js";
-import { initialCharacter, hasMeaningfulData, nextId } from "../character.js";
+import { initialCharacter, hasMeaningfulData, nextId, normalizeCharacter } from "../character.js";
 import { characterFileName, characterToJson, downloadJson, parseCharacterFile } from "../importExport.js";
 import type { Character, IndexEntry, Preset, StorageStatus } from "../types.js";
 import type { Strings } from "../i18n.js";
@@ -22,7 +22,7 @@ function loadInitialState(): { char: Character; currentId: string | null; status
     const res = storageGet(charKey(id));
     if (res && res.value) {
       try {
-        return { char: { ...initialCharacter(), ...JSON.parse(res.value) }, currentId: id, status: "saved" };
+        return { char: normalizeCharacter(JSON.parse(res.value)), currentId: id, status: "saved" };
       } catch {
         /* dati corrotti: si riparte da vuoto */
       }
@@ -181,7 +181,7 @@ export function useCharacterSheet(t: Strings) {
     if (res && res.value) {
       try {
         skipNextAutosave.current = true;
-        setChar({ ...initialCharacter(), ...JSON.parse(res.value) });
+        setChar(normalizeCharacter(JSON.parse(res.value)));
         setCurrentId(id);
         setStatus("saved");
         storageSet(LAST_OPENED_KEY, id);
@@ -197,7 +197,7 @@ export function useCharacterSheet(t: Strings) {
     flushPendingSave();
     try {
       const id = nextId();
-      const data = { ...initialCharacter(), ...deepClone(preset.data) };
+      const data = normalizeCharacter(deepClone(preset.data));
       storageSet(charKey(id), JSON.stringify(data));
       upsertIndexEntry(entryFor(id, data));
       storageSet(LAST_OPENED_KEY, id);
@@ -219,7 +219,7 @@ export function useCharacterSheet(t: Strings) {
     const res = storageGet(charKey(id));
     if (!res || !res.value) return;
     try {
-      const saved: Character = { ...initialCharacter(), ...JSON.parse(res.value) };
+      const saved = normalizeCharacter(JSON.parse(res.value));
       downloadJson(characterFileName(saved), characterToJson(saved));
     } catch {
       /* dati corrotti: niente da esportare */
@@ -237,7 +237,7 @@ export function useCharacterSheet(t: Strings) {
     if (!confirmDiscard()) return;
     flushPendingSave();
     const id = nextId();
-    const data = { ...initialCharacter(), ...parsed };
+    const data = normalizeCharacter(parsed);
     storageSet(charKey(id), JSON.stringify(data));
     upsertIndexEntry(entryFor(id, data));
     storageSet(LAST_OPENED_KEY, id);
@@ -246,6 +246,28 @@ export function useCharacterSheet(t: Strings) {
     setCurrentId(id);
     setStatus("saved");
     setShowLoadPanel(false);
+  };
+
+  // Crea una copia indipendente di un personaggio salvato, con un id nuovo:
+  // resta nel pannello "Carica" senza toccare il personaggio aperto al
+  // momento, utile per provare varianti (respec, livello diverso, ecc.)
+  // senza perdere l'originale.
+  const duplicateCharacter = (id: string) => {
+    const res = storageGet(charKey(id));
+    if (!res || !res.value) return;
+    try {
+      const source = normalizeCharacter(JSON.parse(res.value));
+      const copy = deepClone(source);
+      copy.identity.name = (copy.identity.name.trim() || t.untitled) + t.copySuffix;
+      const newId = nextId();
+      storageSet(charKey(newId), JSON.stringify(copy));
+      upsertIndexEntry(entryFor(newId, copy));
+      const list = readIndex();
+      list.sort((a, b) => b.updatedAt - a.updatedAt);
+      setSavedList(list);
+    } catch {
+      /* dati corrotti: niente da duplicare */
+    }
   };
 
   const deleteCharacter = (id: string) => {
@@ -287,6 +309,7 @@ export function useCharacterSheet(t: Strings) {
     loadCharacter,
     loadPreset,
     deleteCharacter,
+    duplicateCharacter,
     applyStandardArray,
     exportCurrent,
     exportSaved,

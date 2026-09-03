@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TRAITS } from "../../data/gameData.js";
 import { Field, PipTrack, Section } from "../UI.js";
-import type { Thresholds, Traits, UpdateFn, Vitals } from "../../types.js";
+import type { Conditions, Thresholds, Traits, UpdateFn, Vitals } from "../../types.js";
 import type { Strings } from "../../i18n.js";
 
 export function TraitsTab({
@@ -9,6 +9,7 @@ export function TraitsTab({
   traits,
   vitals,
   thresholds,
+  conditions,
   level,
   update,
   applyStandardArray,
@@ -17,6 +18,7 @@ export function TraitsTab({
   traits: Traits;
   vitals: Vitals;
   thresholds: Thresholds;
+  conditions: Conditions;
   level: number;
   update: UpdateFn;
   applyStandardArray: () => void;
@@ -196,6 +198,27 @@ export function TraitsTab({
               />
             </div>
           </div>
+        </div>
+      </Section>
+
+      <Section title={t.conditions} accent="var(--fear)">
+        <div className="condition-row">
+          {(
+            [
+              ["hidden", t.conditionHidden],
+              ["restrained", t.conditionRestrained],
+              ["vulnerable", t.conditionVulnerable],
+            ] as const
+          ).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              className={`tab-btn ${conditions[key] ? "active" : ""}`}
+              onClick={() => update(`conditions.${key}`, !conditions[key])}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </Section>
 

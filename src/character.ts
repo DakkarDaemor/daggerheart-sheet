@@ -1,5 +1,5 @@
 import { STANDARD_ARRAY } from "./data/gameData.js";
-import type { Character, Weapon } from "./types.js";
+import type { Character, DomainCard, Weapon } from "./types.js";
 
 /* ---------------------------------------------------------------------
    STATO INIZIALE
@@ -38,6 +38,7 @@ export const initialCharacter = (): Character => ({
     goldChest: 0,
   },
   thresholds: { baseMajor: 0, baseSevere: 0 },
+  conditions: { hidden: false, restrained: false, vulnerable: false },
   weapons: { primary: emptyWeapon(), secondary: emptyWeapon() },
   armorItem: { name: "", baseScore: 0, baseMajor: 0, baseSevere: 0 },
   inventory: "",
@@ -55,3 +56,23 @@ export const initialCharacter = (): Character => ({
 
 export const hasMeaningfulData = (c: Character): boolean =>
   !!(c.identity.name.trim() || c.identity.className || c.identity.ancestry || c.identity.community);
+
+const normalizeDomainCard = (card: DomainCard): DomainCard => ({
+  ...card,
+  location: card.location ?? "loadout",
+});
+
+// Punto unico di merge fra i dati letti da localStorage/file/preset (spesso
+// parziali o di versioni precedenti dell'app) e lo scheletro vuoto: oltre a
+// riempire i campi mancanti a livello superiore, applica i default per i
+// sotto-campi introdotti dopo (conditions, location delle carte dominio),
+// altrimenti un merge shallow non li recupererebbe.
+export const normalizeCharacter = (partial: Partial<Character>): Character => {
+  const base = initialCharacter();
+  return {
+    ...base,
+    ...partial,
+    conditions: { ...base.conditions, ...partial.conditions },
+    domainCards: (partial.domainCards ?? []).map(normalizeDomainCard),
+  };
+};

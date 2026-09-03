@@ -358,6 +358,28 @@ function Section({ title, children, accent }) {
   );
 }
 
+// Textarea che si autoregola in altezza sul proprio contenuto — niente
+// maniglia di resize manuale, cresce da sola sia digitando sia quando il
+// valore cambia da fuori (caricamento personaggio/preset).
+function AutoTextarea({ value, onChange, className, placeholder }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + "px";
+  }, [value]);
+  return (
+    <textarea
+      ref={ref}
+      className={`autosize ${className || ""}`}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+    />
+  );
+}
+
 /* ---------------------------------------------------------------------
    APP PRINCIPALE
 --------------------------------------------------------------------- */
@@ -862,14 +884,14 @@ function DaggerheartSheet() {
                   <Field label={t.wTrait}><input value={weapons[slot].trait} onChange={(e) => update(`weapons.${slot}.trait`, e.target.value)} /></Field>
                   <Field label={t.wRange}><input value={weapons[slot].range} onChange={(e) => update(`weapons.${slot}.range`, e.target.value)} /></Field>
                   <Field label={t.wDamage} wide><input value={weapons[slot].damage} onChange={(e) => update(`weapons.${slot}.damage`, e.target.value)} /></Field>
-                  <Field label={t.wFeature} wide><textarea value={weapons[slot].feature} onChange={(e) => update(`weapons.${slot}.feature`, e.target.value)} /></Field>
+                  <Field label={t.wFeature} wide><AutoTextarea value={weapons[slot].feature} onChange={(e) => update(`weapons.${slot}.feature`, e.target.value)} /></Field>
                 </div>
               </div>
             ))}
           </Section>
 
           <Section title={t.inventory} accent="var(--text-dim)">
-            <textarea placeholder={t.inventoryPh} value={char.inventory} onChange={(e) => update("inventory", e.target.value)} style={{ minHeight: 100 }} />
+            <AutoTextarea placeholder={t.inventoryPh} value={char.inventory} onChange={(e) => update("inventory", e.target.value)} />
           </Section>
         </>
       )}
@@ -877,17 +899,17 @@ function DaggerheartSheet() {
       {tab === "abilities" && (
         <>
           <Section title={t.classFeature} accent="var(--hope)">
-            <textarea value={char.classFeature} onChange={(e) => update("classFeature", e.target.value)} />
+            <AutoTextarea value={char.classFeature} onChange={(e) => update("classFeature", e.target.value)} />
           </Section>
           <Section title={t.hopeFeature} accent="var(--hope)">
-            <textarea value={char.hopeFeature} onChange={(e) => update("hopeFeature", e.target.value)} />
+            <AutoTextarea value={char.hopeFeature} onChange={(e) => update("hopeFeature", e.target.value)} />
           </Section>
           <Section title={t.ancestryFeatures} accent="var(--fear)">
-            <Field label={identity.ancestry || "1"} wide><textarea value={char.ancestryFeature1} onChange={(e) => update("ancestryFeature1", e.target.value)} /></Field>
-            <Field label={identity.mixed ? (identity.ancestry2 || "2") : "2"} wide><textarea value={char.ancestryFeature2} onChange={(e) => update("ancestryFeature2", e.target.value)} /></Field>
+            <Field label={identity.ancestry || "1"} wide><AutoTextarea value={char.ancestryFeature1} onChange={(e) => update("ancestryFeature1", e.target.value)} /></Field>
+            <Field label={identity.mixed ? (identity.ancestry2 || "2") : "2"} wide><AutoTextarea value={char.ancestryFeature2} onChange={(e) => update("ancestryFeature2", e.target.value)} /></Field>
           </Section>
           <Section title={t.communityFeature} accent="var(--fear)">
-            <textarea value={char.communityFeature} onChange={(e) => update("communityFeature", e.target.value)} />
+            <AutoTextarea value={char.communityFeature} onChange={(e) => update("communityFeature", e.target.value)} />
           </Section>
 
           <Section title={t.experiences} accent="var(--hope)">
@@ -915,7 +937,7 @@ function DaggerheartSheet() {
                   </Field>
                   <Field label={t.cardLevel}><input type="number" min="1" max="10" value={card.level} onChange={(e) => editDomainCard(card.id, "level", Number(e.target.value))} /></Field>
                   <Field label={t.cardRecall}><input type="number" min="0" value={card.recall} onChange={(e) => editDomainCard(card.id, "recall", Number(e.target.value))} /></Field>
-                  <Field label={t.cardDesc} wide><textarea className="tall" value={card.description} onChange={(e) => editDomainCard(card.id, "description", e.target.value)} /></Field>
+                  <Field label={t.cardDesc} wide><AutoTextarea className="tall" value={card.description} onChange={(e) => editDomainCard(card.id, "description", e.target.value)} /></Field>
                 </div>
                 <button className="remove-x" onClick={() => removeDomainCard(card.id)} aria-label={t.remove}>×</button>
               </div>

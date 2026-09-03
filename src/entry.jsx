@@ -252,6 +252,7 @@ const STR = {
     presetsTitle: "Personaggi precompilati", usePreset: "Usa come base",
     confirmDeleteChar: "Eliminare questo personaggio salvato? Non è reversibile.",
     confirmDiscardUnsaved: "Questo personaggio non è ancora salvato: i dati inseriti andranno persi. Continuare?",
+    confirmRemoveItem: "Rimuovere questa voce? Non è reversibile.",
   },
   en: {
     subtitle: "Character sheet",
@@ -286,6 +287,7 @@ const STR = {
     presetsTitle: "Preset characters", usePreset: "Use as base",
     confirmDeleteChar: "Delete this saved character? This cannot be undone.",
     confirmDiscardUnsaved: "This character hasn't been saved yet: the data you entered will be lost. Continue?",
+    confirmRemoveItem: "Remove this entry? This cannot be undone.",
   },
 };
 
@@ -447,8 +449,28 @@ function DaggerheartSheet() {
     });
   }, []);
 
+  const confirmDiscard = () => {
+    if (!currentId && hasMeaningfulData(char)) {
+      return window.confirm(t.confirmDiscardUnsaved);
+    }
+    return true;
+  };
+
+  // Se il personaggio corrente è già salvato ma ha una modifica in sospeso
+  // (debounce dell'autosave non ancora scattato), la scrive subito prima
+  // di lasciare la scheda, per non perdere l'ultima modifica.
+  const flushPendingSave = () => {
+    if (currentId && saveTimer.current) {
+      clearTimeout(saveTimer.current);
+      saveTimer.current = null;
+      const result = storageSet(charKey(currentId), JSON.stringify(char));
+      if (result) upsertIndexEntry(entryFor(currentId, char));
+    }
+  };
+
   const startNew = () => {
-    if (!currentId && hasMeaningfulData(char) && !window.confirm(t.confirmDiscardUnsaved)) return;
+    if (!confirmDiscard()) return;
+    flushPendingSave();
     skipNextAutosave.current = true;
     setChar(initialCharacter());
     setCurrentId(null);
@@ -475,6 +497,8 @@ function DaggerheartSheet() {
   };
 
   const loadCharacter = (id) => {
+    if (!confirmDiscard()) return;
+    flushPendingSave();
     const res = storageGet(charKey(id));
     if (res && res.value) {
       try {
@@ -489,6 +513,8 @@ function DaggerheartSheet() {
   };
 
   const loadPreset = (preset) => {
+    if (!confirmDiscard()) return;
+    flushPendingSave();
     try {
       const id = nextId();
       const data = { ...initialCharacter(), ...deepClone(preset.data) };
@@ -545,13 +571,19 @@ function DaggerheartSheet() {
   const subclassOptions = identity.className ? SUBCLASSES[identity.className] : [];
 
   const addExperience = () => update("experiences", [...char.experiences, { id: nextId(), name: "", mod: 2 }]);
-  const removeExperience = (id) => update("experiences", char.experiences.filter((e) => e.id !== id));
+  const removeExperience = (id) => {
+    if (!window.confirm(t.confirmRemoveItem)) return;
+    update("experiences", char.experiences.filter((e) => e.id !== id));
+  };
   const editExperience = (id, field, value) =>
     update("experiences", char.experiences.map((e) => (e.id === id ? { ...e, [field]: value } : e)));
 
   const addDomainCard = () =>
     update("domainCards", [...char.domainCards, { id: nextId(), name: "", domain: domainOptions[0] || DOMAINS[0], level: 1, recall: 0, description: "" }]);
-  const removeDomainCard = (id) => update("domainCards", char.domainCards.filter((c) => c.id !== id));
+  const removeDomainCard = (id) => {
+    if (!window.confirm(t.confirmRemoveItem)) return;
+    update("domainCards", char.domainCards.filter((c) => c.id !== id));
+  };
   const editDomainCard = (id, field, value) =>
     update("domainCards", char.domainCards.map((c) => (c.id === id ? { ...c, [field]: value } : c)));
 

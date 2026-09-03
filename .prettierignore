@@ -1,0 +1,8 @@
+node_modules/
+build/
+index.html
+package-lock.json
+README.md
+# CSS compatto scritto a mano di proposito: niente minificatore in build,
+# riformattarlo gonfierebbe l'HTML finale senza alcun beneficio.
+src/template.html

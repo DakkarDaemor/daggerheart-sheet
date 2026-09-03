@@ -4,7 +4,7 @@ const esbuild = require("esbuild");
 const fs = require("fs");
 
 esbuild.buildSync({
-  entryPoints: ["src/entry.jsx"],
+  entryPoints: ["src/entry.tsx"],
   bundle: true,
   minify: true,
   format: "iife",

@@ -16,15 +16,16 @@ su un font di sistema).
 
 ## Sviluppo
 
-Il sorgente React è in `src/entry.jsx`. `index.html` è già compilato e
-pronto all'uso: non serve alcuna build per usarlo così com'è.
+Il sorgente React/TypeScript è in `src/` (entry point: `src/entry.tsx`).
+`index.html` è già compilato e pronto all'uso: non serve alcuna build per
+usarlo così com'è.
 
 Per modificarlo:
 
 ```bash
 npm install
-# modifica src/entry.jsx
-npm run build   # rigenera index.html da src/entry.jsx + src/template.html
+# modifica i file in src/
+npm run build   # rigenera index.html da src/entry.tsx + src/template.html
 ```
 
 `npm run build` impacchetta React/ReactDOM e il componente in un unico
@@ -32,9 +33,25 @@ bundle (esbuild) e lo inietta in `src/template.html`, producendo un
 `index.html` singolo e autosufficiente — nessuna CDN esterna a runtime,
 a parte i font.
 
+Altri comandi utili:
+
+```bash
+npm run typecheck    # controllo tipi TypeScript (tsc --noEmit)
+npm run lint          # ESLint
+npm run lint:fix       # ESLint con fix automatico
+npm run format         # riformatta con Prettier
+npm run format:check   # verifica la formattazione senza modificare i file
+npm run test            # esegue la suite di test (Vitest)
+npm run test:watch      # test in watch mode
+npm run verify           # typecheck + lint + format:check + test + build
+```
+
+`npm run verify` è la stessa sequenza eseguita in CI (GitHub Actions,
+vedi `.github/workflows/ci.yml`) su ogni push/PR.
+
 ### Aggiungere personaggi precompilati
 
-In `src/entry.jsx` cerca `const PRESETS = []` e aggiungi voci così:
+In `src/data/presets.ts` aggiungi voci all'array `PRESETS` così:
 
 ```js
 const PRESETS = [

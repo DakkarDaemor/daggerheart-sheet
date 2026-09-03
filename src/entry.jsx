@@ -915,7 +915,7 @@ function DaggerheartSheet() {
                   </Field>
                   <Field label={t.cardLevel}><input type="number" min="1" max="10" value={card.level} onChange={(e) => editDomainCard(card.id, "level", Number(e.target.value))} /></Field>
                   <Field label={t.cardRecall}><input type="number" min="0" value={card.recall} onChange={(e) => editDomainCard(card.id, "recall", Number(e.target.value))} /></Field>
-                  <Field label={t.cardDesc} wide><textarea value={card.description} onChange={(e) => editDomainCard(card.id, "description", e.target.value)} /></Field>
+                  <Field label={t.cardDesc} wide><textarea className="tall" value={card.description} onChange={(e) => editDomainCard(card.id, "description", e.target.value)} /></Field>
                 </div>
                 <button className="remove-x" onClick={() => removeDomainCard(card.id)} aria-label={t.remove}>×</button>
               </div>

@@ -8,6 +8,7 @@ import type { Lang } from "./types.js";
 --------------------------------------------------------------------- */
 const it = {
   subtitle: "Scheda personaggio",
+  actionsMenu: "Menu azioni",
   tabIdentity: "Identità",
   tabTraits: "Tratti & Vitali",
   tabEquip: "Equipaggiamento",
@@ -123,6 +124,7 @@ const it = {
 
 const en = {
   subtitle: "Character sheet",
+  actionsMenu: "Actions menu",
   tabIdentity: "Identity",
   tabTraits: "Traits & Vitals",
   tabEquip: "Equipment",

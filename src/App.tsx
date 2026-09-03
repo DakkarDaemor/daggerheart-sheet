@@ -18,6 +18,7 @@ export function DaggerheartSheet() {
   const [lang, setLang] = useState<Lang>("it");
   const t = STR[lang];
   const [tab, setTab] = useState<TabKey>("identity");
+  const [showActionMenu, setShowActionMenu] = useState(false);
 
   const {
     char,
@@ -46,6 +47,18 @@ export function DaggerheartSheet() {
     const file = e.target.files?.[0];
     e.target.value = ""; // permette di riselezionare lo stesso file in seguito
     if (file) void importFromFile(file);
+  };
+
+  // Le azioni Nuovo/Salva/Carica/Esporta/Importa/Fullscreen non si usano di
+  // continuo come le tab: vivono in un menu nell'header invece che in una
+  // riga di pulsanti sempre in vista sopra le tab.
+  const runMenuAction = (action: () => void) => () => {
+    setShowActionMenu(false);
+    action();
+  };
+  const openFilePicker = () => {
+    setShowActionMenu(false);
+    fileInputRef.current?.click();
   };
 
   const { identity, traits, vitals, thresholds, weapons, armorItem } = char;
@@ -77,40 +90,36 @@ export function DaggerheartSheet() {
           <h1 className="title">Daggerheart</h1>
           <p className="subtitle">{t.subtitle}</p>
         </div>
-        <div className="lang-toggle">
-          <button className={lang === "it" ? "active" : ""} onClick={() => setLang("it")}>
-            IT
+        <div className="header-controls">
+          <div className="lang-toggle">
+            <button className={lang === "it" ? "active" : ""} onClick={() => setLang("it")}>
+              IT
+            </button>
+            <button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>
+              EN
+            </button>
+          </div>
+          <button
+            className={`menu-btn ${showActionMenu ? "active" : ""}`}
+            aria-label={t.actionsMenu}
+            aria-expanded={showActionMenu}
+            onClick={() => setShowActionMenu((v) => !v)}
+          >
+            ⋮
           </button>
-          <button className={lang === "en" ? "active" : ""} onClick={() => setLang("en")}>
-            EN
-          </button>
+          {showActionMenu && (
+            <div className="action-menu">
+              <button onClick={runMenuAction(startNew)}>{t.newSheet}</button>
+              <button onClick={runMenuAction(saveNow)}>{t.save}</button>
+              <button onClick={runMenuAction(openLoadPanel)}>{t.load}</button>
+              <button onClick={runMenuAction(exportCurrent)}>{t.exportBtn}</button>
+              <button onClick={openFilePicker}>{t.importBtn}</button>
+              <button onClick={runMenuAction(toggleFullscreen)}>
+                {isFullscreen ? t.exitFullscreen : t.fullscreen}
+              </button>
+            </div>
+          )}
         </div>
-      </div>
-
-      <div className="status-row">
-        <span className={`status-dot ${status === "saving" ? "saving" : status === "error" ? "error" : ""}`} />
-        {statusText}
-      </div>
-
-      <div className="action-row">
-        <button className="action-btn" onClick={startNew}>
-          {t.newSheet}
-        </button>
-        <button className="action-btn primary" onClick={saveNow}>
-          {t.save}
-        </button>
-        <button className="action-btn secondary" onClick={openLoadPanel}>
-          {t.load}
-        </button>
-        <button className="action-btn" onClick={exportCurrent}>
-          {t.exportBtn}
-        </button>
-        <button className="action-btn" onClick={() => fileInputRef.current?.click()}>
-          {t.importBtn}
-        </button>
-        <button className="action-btn" onClick={toggleFullscreen}>
-          {isFullscreen ? "⤦" : "⛶"}
-        </button>
         <input
           ref={fileInputRef}
           type="file"
@@ -118,6 +127,11 @@ export function DaggerheartSheet() {
           onChange={handleImportFile}
           style={{ display: "none" }}
         />
+      </div>
+
+      <div className="status-row">
+        <span className={`status-dot ${status === "saving" ? "saving" : status === "error" ? "error" : ""}`} />
+        {statusText}
       </div>
 
       {showLoadPanel && (

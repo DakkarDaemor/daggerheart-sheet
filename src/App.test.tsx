@@ -12,6 +12,10 @@ afterEach(() => {
   localStorage.clear();
 });
 
+// Nuovo/Salva/Carica/Esporta/Importa/Fullscreen vivono in un menu nell'header,
+// chiuso di default: va aperto prima di poterne cliccare le voci.
+const openActionsMenu = () => userEvent.click(screen.getByRole("button", { name: "Menu azioni" }));
+
 describe("DaggerheartSheet", () => {
   it("renders the identity tab by default", () => {
     render(<DaggerheartSheet />);
@@ -29,6 +33,7 @@ describe("DaggerheartSheet", () => {
     render(<DaggerheartSheet />);
     const preset = PRESETS[0]!;
 
+    await openActionsMenu();
     await userEvent.click(screen.getByRole("button", { name: "Carica" }));
     const presetRow = screen.getByText(preset.name).closest(".load-item") as HTMLElement;
     await userEvent.click(within(presetRow).getByRole("button", { name: "Usa come base" }));
@@ -97,7 +102,9 @@ describe("DaggerheartSheet", () => {
   it("duplicates a saved character without touching the one currently open", async () => {
     render(<DaggerheartSheet />);
     await userEvent.type(screen.getByLabelText("Nome"), "Original Hero");
+    await openActionsMenu();
     await userEvent.click(screen.getByRole("button", { name: "Salva" }));
+    await openActionsMenu();
     await userEvent.click(screen.getByRole("button", { name: "Carica" }));
 
     const row = screen.getByText("Original Hero").closest(".load-item") as HTMLElement;

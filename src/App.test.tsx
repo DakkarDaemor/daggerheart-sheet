@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { DaggerheartSheet } from "./App.js";
@@ -37,5 +37,30 @@ describe("DaggerheartSheet", () => {
 
     await userEvent.click(screen.getByRole("button", { name: "Abilità & Domini" }));
     expect(screen.getByDisplayValue(preset.data.domainCards![0]!.name)).toBeInTheDocument();
+  });
+
+  it("imports a character from a JSON file (device-to-device transfer)", async () => {
+    render(<DaggerheartSheet />);
+    const exported = { identity: { name: "Imported Hero", className: "Wizard" } };
+    const file = new File([JSON.stringify(exported)], "daggerheart-imported-hero.json", {
+      type: "application/json",
+    });
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    await userEvent.upload(fileInput, file);
+
+    expect(await screen.findByDisplayValue("Imported Hero")).toBeInTheDocument();
+  });
+
+  it("rejects a JSON file that isn't a character sheet", async () => {
+    const alertSpy = vi.spyOn(window, "alert").mockImplementation(() => {});
+    render(<DaggerheartSheet />);
+    const file = new File([JSON.stringify({ foo: "bar" })], "not-a-character.json", { type: "application/json" });
+
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    await userEvent.upload(fileInput, file);
+
+    expect(alertSpy).toHaveBeenCalledWith("Il file scelto non è una scheda personaggio Daggerheart valida.");
+    alertSpy.mockRestore();
   });
 });

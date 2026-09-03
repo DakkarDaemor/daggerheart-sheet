@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { CLASS_DOMAINS, SUBCLASSES } from "./data/gameData.js";
 import { PRESETS } from "./data/presets.js";
 import { STR } from "./i18n.js";
@@ -35,7 +35,17 @@ export function DaggerheartSheet() {
     loadPreset,
     deleteCharacter,
     applyStandardArray,
+    exportCurrent,
+    exportSaved,
+    importFromFile,
   } = useCharacterSheet(t);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleImportFile = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // permette di riselezionare lo stesso file in seguito
+    if (file) void importFromFile(file);
+  };
 
   const { identity, traits, vitals, thresholds, weapons, armorItem } = char;
   const domainOptions = (identity.className ? CLASS_DOMAINS[identity.className] : []) ?? [];
@@ -91,9 +101,22 @@ export function DaggerheartSheet() {
         <button className="action-btn secondary" onClick={openLoadPanel}>
           {t.load}
         </button>
+        <button className="action-btn" onClick={exportCurrent}>
+          {t.exportBtn}
+        </button>
+        <button className="action-btn" onClick={() => fileInputRef.current?.click()}>
+          {t.importBtn}
+        </button>
         <button className="action-btn" onClick={toggleFullscreen}>
           {isFullscreen ? "⤦" : "⛶"}
         </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/json"
+          onChange={handleImportFile}
+          style={{ display: "none" }}
+        />
       </div>
 
       {showLoadPanel && (
@@ -118,6 +141,9 @@ export function DaggerheartSheet() {
               <div className="load-item-actions">
                 <button className="small-btn accent" onClick={() => loadCharacter(entry.id)}>
                   {t.open}
+                </button>
+                <button className="small-btn" onClick={() => exportSaved(entry.id)}>
+                  {t.exportBtn}
                 </button>
                 <button className="small-btn danger" onClick={() => deleteCharacter(entry.id)}>
                   {t.delete}

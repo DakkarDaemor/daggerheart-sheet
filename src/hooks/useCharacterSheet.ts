@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { TRAITS, STANDARD_ARRAY_VALUES } from "../data/gameData.js";
 import { INDEX_KEY, LAST_OPENED_KEY, charKey, storageGet, storageSet, storageDelete, deepClone } from "../storage.js";
 import { initialCharacter, hasMeaningfulData, nextId } from "../character.js";
+import { characterFileName, characterToJson, downloadJson, parseCharacterFile } from "../importExport.js";
 import type { Character, IndexEntry, Preset, StorageStatus } from "../types.js";
 import type { Strings } from "../i18n.js";
 
@@ -210,6 +211,43 @@ export function useCharacterSheet(t: Strings) {
     }
   };
 
+  const exportCurrent = () => {
+    downloadJson(characterFileName(char), characterToJson(char));
+  };
+
+  const exportSaved = (id: string) => {
+    const res = storageGet(charKey(id));
+    if (!res || !res.value) return;
+    try {
+      const saved: Character = { ...initialCharacter(), ...JSON.parse(res.value) };
+      downloadJson(characterFileName(saved), characterToJson(saved));
+    } catch {
+      /* dati corrotti: niente da esportare */
+    }
+  };
+
+  const importFromFile = async (file: File) => {
+    let parsed;
+    try {
+      parsed = parseCharacterFile(await file.text());
+    } catch {
+      window.alert(t.importInvalidFile);
+      return;
+    }
+    if (!confirmDiscard()) return;
+    flushPendingSave();
+    const id = nextId();
+    const data = { ...initialCharacter(), ...parsed };
+    storageSet(charKey(id), JSON.stringify(data));
+    upsertIndexEntry(entryFor(id, data));
+    storageSet(LAST_OPENED_KEY, id);
+    skipNextAutosave.current = true;
+    setChar(data);
+    setCurrentId(id);
+    setStatus("saved");
+    setShowLoadPanel(false);
+  };
+
   const deleteCharacter = (id: string) => {
     if (!window.confirm(t.confirmDeleteChar)) return;
     storageDelete(charKey(id));
@@ -250,5 +288,8 @@ export function useCharacterSheet(t: Strings) {
     loadPreset,
     deleteCharacter,
     applyStandardArray,
+    exportCurrent,
+    exportSaved,
+    importFromFile,
   };
 }

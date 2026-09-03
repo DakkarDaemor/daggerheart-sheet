@@ -211,6 +211,9 @@ function storageDelete(key) {
   localStorage.removeItem(key);
   return { key, deleted: true };
 }
+// Clone via JSON invece di structuredClone: quest'ultima manca o è
+// inaffidabile in alcuni browser/webview meno recenti.
+const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
 
 /* ---------------------------------------------------------------------
    TRADUZIONI INTERFACCIA
@@ -435,7 +438,7 @@ function DaggerheartSheet() {
 
   const update = useCallback((path, value) => {
     setChar((prev) => {
-      const next = structuredClone(prev);
+      const next = deepClone(prev);
       const keys = path.split(".");
       let ref = next;
       for (let i = 0; i < keys.length - 1; i++) ref = ref[keys[i]];
@@ -486,16 +489,20 @@ function DaggerheartSheet() {
   };
 
   const loadPreset = (preset) => {
-    const id = nextId();
-    const data = { ...initialCharacter(), ...structuredClone(preset.data) };
-    storageSet(charKey(id), JSON.stringify(data));
-    upsertIndexEntry(entryFor(id, data));
-    storageSet(LAST_OPENED_KEY, id);
-    skipNextAutosave.current = true;
-    setChar(data);
-    setCurrentId(id);
-    setStatus("saved");
-    setShowLoadPanel(false);
+    try {
+      const id = nextId();
+      const data = { ...initialCharacter(), ...deepClone(preset.data) };
+      storageSet(charKey(id), JSON.stringify(data));
+      upsertIndexEntry(entryFor(id, data));
+      storageSet(LAST_OPENED_KEY, id);
+      skipNextAutosave.current = true;
+      setChar(data);
+      setCurrentId(id);
+      setStatus("saved");
+      setShowLoadPanel(false);
+    } catch (e) {
+      setStatus("error");
+    }
   };
 
   const deleteCharacter = (id) => {

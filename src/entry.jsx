@@ -252,6 +252,7 @@ const STR = {
     presetsTitle: "Personaggi precompilati", usePreset: "Usa come base",
     confirmDeleteChar: "Eliminare questo personaggio salvato? Non è reversibile.",
     confirmDiscardUnsaved: "Questo personaggio non è ancora salvato: i dati inseriti andranno persi. Continuare?",
+    confirmNewClearsSaved: "Il personaggio attuale è salvato e resta recuperabile da \"Carica\". Aprire comunque una scheda vuota?",
     confirmRemoveItem: "Rimuovere questa voce? Non è reversibile.",
   },
   en: {
@@ -287,6 +288,7 @@ const STR = {
     presetsTitle: "Preset characters", usePreset: "Use as base",
     confirmDeleteChar: "Delete this saved character? This cannot be undone.",
     confirmDiscardUnsaved: "This character hasn't been saved yet: the data you entered will be lost. Continue?",
+    confirmNewClearsSaved: "The current character is saved and stays recoverable from \"Load\". Open a blank sheet anyway?",
     confirmRemoveItem: "Remove this entry? This cannot be undone.",
   },
 };
@@ -491,7 +493,10 @@ function DaggerheartSheet() {
   };
 
   const startNew = () => {
-    if (!confirmDiscard()) return;
+    if (hasMeaningfulData(char)) {
+      const msg = currentId ? t.confirmNewClearsSaved : t.confirmDiscardUnsaved;
+      if (!window.confirm(msg)) return;
+    }
     flushPendingSave();
     skipNextAutosave.current = true;
     setChar(initialCharacter());

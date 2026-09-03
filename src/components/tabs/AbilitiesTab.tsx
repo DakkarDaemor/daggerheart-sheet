@@ -58,10 +58,10 @@ export function AbilitiesTab({
         <AutoTextarea value={char.hopeFeature} onChange={(e) => update("hopeFeature", e.target.value)} />
       </Section>
       <Section title={t.ancestryFeatures} accent="var(--fear)">
-        <Field label={identity.ancestry || "1"} wide>
+        <Field label={identity.ancestry || t.ancestryFeature1Fallback} wide>
           <AutoTextarea value={char.ancestryFeature1} onChange={(e) => update("ancestryFeature1", e.target.value)} />
         </Field>
-        <Field label={identity.mixed ? identity.ancestry2 || "2" : "2"} wide>
+        <Field label={(identity.mixed && identity.ancestry2) || t.ancestryFeature2Fallback} wide>
           <AutoTextarea value={char.ancestryFeature2} onChange={(e) => update("ancestryFeature2", e.target.value)} />
         </Field>
       </Section>

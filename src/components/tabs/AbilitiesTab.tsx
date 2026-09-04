@@ -212,16 +212,14 @@ export function AbilitiesTab({
         <h3 className="section-title">{t.domainCardsLoadout}</h3>
         <p className="hint">{t.loadoutHint}</p>
         {loadoutCards.map(renderDomainCard)}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
-          {renderCardPicker("loadout")}
-          <button className="ghost-btn" onClick={() => addDomainCard("loadout")}>
-            {t.addCard}
-          </button>
-        </div>
+        <button className="ghost-btn" onClick={() => addDomainCard("loadout")}>
+          {t.addCard}
+        </button>
 
         <h3 className="section-title" style={{ marginTop: 16 }}>
           {t.domainCardsVault}
         </h3>
+        {lang === "it" && <p className="hint">{t.vaultPickerHint}</p>}
         {vaultCards.map(renderDomainCard)}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
           {renderCardPicker("vault")}

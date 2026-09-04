@@ -11,6 +11,7 @@ function setup(overrides?: Partial<ReturnType<typeof initialCharacter>>) {
   render(
     <TraitsTab
       t={STR.it}
+      lang="it"
       traits={char.traits}
       vitals={char.vitals}
       thresholds={char.thresholds}
@@ -32,20 +33,20 @@ describe("TraitsTab — calcolo danno subito", () => {
   it("marks 1 HP for damage below the major threshold", async () => {
     setup({ thresholds: { baseMajor: 6, baseSevere: 13 } });
     await userEvent.type(screen.getByLabelText(STR.it.incomingDamage), "3");
-    expect(screen.getByText(/1 PF \(sotto Major\)/)).toBeInTheDocument();
+    expect(screen.getByText(/1 PF \(sotto Maggiore\)/)).toBeInTheDocument();
   });
 
   it("marks 2 HP for damage between major and severe", async () => {
     setup({ thresholds: { baseMajor: 6, baseSevere: 13 } });
     await userEvent.type(screen.getByLabelText(STR.it.incomingDamage), "8");
-    expect(screen.getByText(/2 PF \(Major–Severe\)/)).toBeInTheDocument();
+    expect(screen.getByText(/2 PF \(Maggiore–Grave\)/)).toBeInTheDocument();
   });
 
   it("marks 3 HP for damage at or above severe, and flags the massive-damage hint at 2x severe", async () => {
     // effective severe = baseSevere(13) + level(1) = 14; massive threshold = 2x14 = 28.
     setup({ thresholds: { baseMajor: 6, baseSevere: 13 } });
     await userEvent.type(screen.getByLabelText(STR.it.incomingDamage), "30");
-    expect(screen.getByText(/3 PF \(Severe o oltre\)/)).toBeInTheDocument();
+    expect(screen.getByText(/3 PF \(Grave o oltre\)/)).toBeInTheDocument();
     expect(screen.getByText(/regola opzionale: segna 4 PF/)).toBeInTheDocument();
   });
 
@@ -56,6 +57,6 @@ describe("TraitsTab — calcolo danno subito", () => {
     char.thresholds = { baseMajor: 6, baseSevere: 13 };
     setup(char);
     await userEvent.type(screen.getByLabelText(STR.it.incomingDamage), "7");
-    expect(screen.getByText(/1 PF \(sotto Major\)/)).toBeInTheDocument();
+    expect(screen.getByText(/1 PF \(sotto Maggiore\)/)).toBeInTheDocument();
   });
 });

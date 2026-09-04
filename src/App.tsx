@@ -206,6 +206,7 @@ export function DaggerheartSheet() {
       {tab === "identity" && (
         <IdentityTab
           t={t}
+          lang={lang}
           identity={identity}
           update={update}
           domainOptions={domainOptions}
@@ -216,6 +217,7 @@ export function DaggerheartSheet() {
       {tab === "traits" && (
         <TraitsTab
           t={t}
+          lang={lang}
           traits={traits}
           vitals={vitals}
           thresholds={thresholds}
@@ -231,7 +233,7 @@ export function DaggerheartSheet() {
       )}
 
       {tab === "abilities" && (
-        <AbilitiesTab t={t} char={char} identity={identity} update={update} domainOptions={domainOptions} />
+        <AbilitiesTab t={t} lang={lang} char={char} identity={identity} update={update} domainOptions={domainOptions} />
       )}
     </div>
   );

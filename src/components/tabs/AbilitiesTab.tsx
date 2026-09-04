@@ -1,17 +1,27 @@
-import { DOMAINS } from "../../data/gameData.js";
+import { DOMAINS, domainLabel } from "../../data/gameData.js";
+import { DOMAIN_CARDS_IT } from "../../data/domainCards.js";
 import { nextId } from "../../character.js";
 import { AutoTextarea, Field, Section } from "../UI.js";
-import type { Character, DomainCard, DomainCardLocation, Experience, Identity, UpdateFn } from "../../types.js";
+import type { Character, DomainCard, DomainCardLocation, Experience, Identity, Lang, UpdateFn } from "../../types.js";
 import type { Strings } from "../../i18n.js";
+
+/* Il database delle carte ufficiali (fonte: Carte_Stampabili-Daggerheart_Set-Base_ITA.pdf)
+   esiste solo in italiano: il picker è quindi disponibile solo con lang === "it". */
+const cardsByDomain = DOMAINS.map((domain) => ({
+  domain,
+  cards: DOMAIN_CARDS_IT.filter((c) => c.domain === domain),
+}));
 
 export function AbilitiesTab({
   t,
+  lang,
   char,
   identity,
   update,
   domainOptions,
 }: {
   t: Strings;
+  lang: Lang;
   char: Character;
   identity: Identity;
   update: UpdateFn;
@@ -44,6 +54,22 @@ export function AbilitiesTab({
         location,
       },
     ]);
+  const addOfficialDomainCard = (cardId: string, location: DomainCardLocation) => {
+    const def = DOMAIN_CARDS_IT.find((c) => c.cardId === cardId);
+    if (!def) return;
+    update("domainCards", [
+      ...char.domainCards,
+      {
+        id: nextId(),
+        name: def.name,
+        domain: def.domain,
+        level: def.level,
+        recall: def.recall,
+        description: def.description,
+        location,
+      },
+    ]);
+  };
   const removeDomainCard = (id: string) => {
     if (!window.confirm(t.confirmRemoveItem)) return;
     update(
@@ -61,6 +87,28 @@ export function AbilitiesTab({
   const loadoutCards = char.domainCards.filter((c) => c.location === "loadout");
   const vaultCards = char.domainCards.filter((c) => c.location === "vault");
 
+  const renderCardPicker = (location: DomainCardLocation) =>
+    lang === "it" && (
+      <select
+        value=""
+        onChange={(e) => {
+          if (e.target.value) addOfficialDomainCard(e.target.value, location);
+          e.target.value = "";
+        }}
+      >
+        <option value="">{t.pickOfficialCard}</option>
+        {cardsByDomain.map(({ domain, cards }) => (
+          <optgroup key={domain} label={domainLabel(domain, lang)}>
+            {cards.map((c) => (
+              <option key={c.cardId} value={c.cardId}>
+                {`Liv ${c.level} · ${c.name} (${c.recall}⚡)`}
+              </option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    );
+
   const renderDomainCard = (card: DomainCard) => (
     <div className="list-row" key={card.id}>
       <div className="grid2">
@@ -71,7 +119,7 @@ export function AbilitiesTab({
           <select value={card.domain} onChange={(e) => editDomainCard(card.id, "domain", e.target.value)}>
             {DOMAINS.map((d) => (
               <option key={d} value={d}>
-                {d}
+                {domainLabel(d, lang)}
               </option>
             ))}
           </select>
@@ -164,17 +212,23 @@ export function AbilitiesTab({
         <h3 className="section-title">{t.domainCardsLoadout}</h3>
         <p className="hint">{t.loadoutHint}</p>
         {loadoutCards.map(renderDomainCard)}
-        <button className="ghost-btn" onClick={() => addDomainCard("loadout")}>
-          {t.addCard}
-        </button>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+          {renderCardPicker("loadout")}
+          <button className="ghost-btn" onClick={() => addDomainCard("loadout")}>
+            {t.addCard}
+          </button>
+        </div>
 
         <h3 className="section-title" style={{ marginTop: 16 }}>
           {t.domainCardsVault}
         </h3>
         {vaultCards.map(renderDomainCard)}
-        <button className="ghost-btn" onClick={() => addDomainCard("vault")}>
-          {t.addCard}
-        </button>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+          {renderCardPicker("vault")}
+          <button className="ghost-btn" onClick={() => addDomainCard("vault")}>
+            {t.addCard}
+          </button>
+        </div>
       </Section>
     </>
   );

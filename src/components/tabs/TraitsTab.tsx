@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { TRAITS } from "../../data/gameData.js";
+import { TRAITS_BY_LANG } from "../../data/gameData.js";
 import { Field, PipTrack, Section } from "../UI.js";
-import type { Conditions, Thresholds, Traits, UpdateFn, Vitals } from "../../types.js";
+import type { Conditions, Lang, Thresholds, Traits, UpdateFn, Vitals } from "../../types.js";
 import type { Strings } from "../../i18n.js";
 
 export function TraitsTab({
   t,
+  lang,
   traits,
   vitals,
   thresholds,
@@ -15,6 +16,7 @@ export function TraitsTab({
   applyStandardArray,
 }: {
   t: Strings;
+  lang: Lang;
   traits: Traits;
   vitals: Vitals;
   thresholds: Thresholds;
@@ -23,6 +25,7 @@ export function TraitsTab({
   update: UpdateFn;
   applyStandardArray: () => void;
 }) {
+  const TRAITS = TRAITS_BY_LANG[lang];
   const effMajor = (Number(thresholds.baseMajor) || 0) + (Number(level) || 0);
   const effSevere = (Number(thresholds.baseSevere) || 0) + (Number(level) || 0);
 

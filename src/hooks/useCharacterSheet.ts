@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TRAITS, STANDARD_ARRAY_VALUES } from "../data/gameData.js";
+import { TRAIT_KEYS, STANDARD_ARRAY_VALUES } from "../data/gameData.js";
 import { INDEX_KEY, LAST_OPENED_KEY, charKey, storageGet, storageSet, storageDelete, deepClone } from "../storage.js";
 import { initialCharacter, hasMeaningfulData, nextId, normalizeCharacter } from "../character.js";
 import { characterFileName, characterToJson, downloadJson, parseCharacterFile } from "../importExport.js";
@@ -287,8 +287,8 @@ export function useCharacterSheet(t: Strings) {
 
   const applyStandardArray = () => {
     const traits: Record<string, number> = {};
-    TRAITS.forEach((tr, i) => {
-      traits[tr.key] = STANDARD_ARRAY_VALUES[i]!;
+    TRAIT_KEYS.forEach((key, i) => {
+      traits[key] = STANDARD_ARRAY_VALUES[i]!;
     });
     update("traits", traits);
   };

@@ -86,7 +86,7 @@ describe("DaggerheartSheet", () => {
   it("adds domain cards to Loadout and Vault separately, and moves a card between them", async () => {
     render(<DaggerheartSheet />);
     await userEvent.click(screen.getByRole("button", { name: "Abilità & Domini" }));
-    const addButtons = () => screen.getAllByRole("button", { name: "+ Aggiungi carta" });
+    const addButtons = () => screen.getAllByRole("button", { name: "+ Carta vuota" });
 
     await userEvent.click(addButtons()[0]!); // + Loadout
     expect(screen.getByRole("button", { name: "→ Vault" })).toBeInTheDocument();

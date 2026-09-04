@@ -1,16 +1,27 @@
-import { ANCESTRIES, COMMUNITIES, CLASSES } from "../../data/gameData.js";
+import {
+  ANCESTRIES,
+  COMMUNITIES,
+  CLASSES,
+  classLabel,
+  domainLabel,
+  subclassLabel,
+  ancestryLabel,
+  communityLabel,
+} from "../../data/gameData.js";
 import { Field, Section } from "../UI.js";
-import type { Identity, UpdateFn } from "../../types.js";
+import type { Identity, Lang, UpdateFn } from "../../types.js";
 import type { Strings } from "../../i18n.js";
 
 export function IdentityTab({
   t,
+  lang,
   identity,
   update,
   domainOptions,
   subclassOptions,
 }: {
   t: Strings;
+  lang: Lang;
   identity: Identity;
   update: UpdateFn;
   domainOptions: string[];
@@ -31,7 +42,7 @@ export function IdentityTab({
             <option value="">—</option>
             {ANCESTRIES.map((a) => (
               <option key={a} value={a}>
-                {a}
+                {ancestryLabel(a, lang)}
               </option>
             ))}
           </select>
@@ -41,7 +52,7 @@ export function IdentityTab({
             <option value="">—</option>
             {COMMUNITIES.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {communityLabel(c, lang)}
               </option>
             ))}
           </select>
@@ -64,7 +75,7 @@ export function IdentityTab({
               <option value="">—</option>
               {ANCESTRIES.map((a) => (
                 <option key={a} value={a}>
-                  {a}
+                  {ancestryLabel(a, lang)}
                 </option>
               ))}
             </select>
@@ -76,7 +87,7 @@ export function IdentityTab({
             <option value="">—</option>
             {CLASSES.map((c) => (
               <option key={c} value={c}>
-                {c}
+                {classLabel(c, lang)}
               </option>
             ))}
           </select>
@@ -90,7 +101,7 @@ export function IdentityTab({
             <option value="">—</option>
             {subclassOptions.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {subclassLabel(s, lang)}
               </option>
             ))}
           </select>
@@ -117,10 +128,10 @@ export function IdentityTab({
 
       {identity.className && (
         <p className="hint">
-          {t.domainAccess}: <b style={{ color: "var(--text)" }}>{domainOptions.join(" · ")}</b>
+          {t.domainAccess}:{" "}
+          <b style={{ color: "var(--text)" }}>{domainOptions.map((d) => domainLabel(d, lang)).join(" · ")}</b>
         </p>
       )}
-      <p className="hint">{t.noOfficialIt}</p>
     </Section>
   );
 }

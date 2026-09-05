@@ -18,7 +18,7 @@ export const PRESETS: Preset[] = [
     data: {
       identity: {
         name: "Khari Nix",
-        pronouns: "She/Her",
+        pronouns: "Lei/Sua",
         ancestry: "Giant",
         mixed: false,
         ancestry2: "",
@@ -172,7 +172,7 @@ export const PRESETS: Preset[] = [
     data: {
       identity: {
         name: "Barnacle",
-        pronouns: "He/Him",
+        pronouns: "Lui/Suo",
         ancestry: "Ribbet",
         mixed: false,
         ancestry2: "",
@@ -250,7 +250,7 @@ export const PRESETS: Preset[] = [
     data: {
       identity: {
         name: "Marlowe Fairwind",
-        pronouns: "She/Her",
+        pronouns: "Lei/Sua",
         ancestry: "Elf",
         mixed: false,
         ancestry2: "",
@@ -284,7 +284,7 @@ export const PRESETS: Preset[] = [
       armorItem: { name: "Corazza di Cuoio", baseScore: 3, baseMajor: 6, baseSevere: 13 },
       inventory: "Pozione di Recupero Minore (elimina 1d4 Stress)",
       classFeature:
-        "Stregone – Percezione Arcana: percepisci presenze/oggetti magici in Ravvicinata. Illusione Minore: Tiro Incantesimo (10) per creare un'illusione visiva minore in Ravvicinata. Incanalare Potere Grezzo: una volta per riposo lungo, manda in Vault una carta dominio dal loadout per ottenere Speranza pari al suo livello, oppure potenziare un incantesimo di danno (+2×livello carta).\nPotere Primordiale (sottoclasse) – Tratto da Incantatore: Istinto. Manipolare la Magia: dopo un incantesimo/attacco magico marca Stress per: estendere la portata, +2 al tiro, raddoppiare un dado danno, o colpire un bersaglio aggiuntivo.",
+        "Stregone – Percezione Arcana: percepisci presenze/oggetti magici in Ravvicinata. Illusione Minore: Tiro Incantesimo (10) per creare un'illusione visiva minore in Ravvicinata. Incanalare Potere Grezzo: una volta per riposo lungo, manda in Riserva una carta dominio dalla Dotazione per ottenere Speranza pari al suo livello, oppure potenziare un incantesimo di danno (+2×livello carta).\nPotere Primordiale (sottoclasse) – Tratto da Incantatore: Istinto. Manipolare la Magia: dopo un incantesimo/attacco magico marca Stress per: estendere la portata, +2 al tiro, raddoppiare un dado danno, o colpire un bersaglio aggiuntivo.",
       hopeFeature:
         "Volatile Magic: spendi 3 Speranza per ritirare un numero qualsiasi di dadi danno su un attacco che infligge danno magico.",
       ancestryFeature1:
@@ -328,7 +328,7 @@ export const PRESETS: Preset[] = [
     data: {
       identity: {
         name: "Garrick Reed",
-        pronouns: "He/Him",
+        pronouns: "Lui/Suo",
         ancestry: "Human",
         mixed: false,
         ancestry2: "",

@@ -4,6 +4,7 @@
 --------------------------------------------------------------------- */
 export const INDEX_KEY = "daggerheart:index";
 export const LAST_OPENED_KEY = "daggerheart:last-opened";
+export const THEME_KEY = "daggerheart:theme";
 export const charKey = (id: string) => `daggerheart:char:${id}`;
 
 export function storageGet(key: string): { key: string; value: string } | null {

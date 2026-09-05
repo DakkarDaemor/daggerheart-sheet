@@ -121,6 +121,8 @@ export interface IndexEntry {
 
 export type Lang = "it" | "en";
 
+export type Theme = "dark" | "light";
+
 export type StorageStatus = "loading" | "new" | "saving" | "saved" | "error";
 
 // Aggiornamento per path puntato (es. "identity.name", "weapons.primary.name"):

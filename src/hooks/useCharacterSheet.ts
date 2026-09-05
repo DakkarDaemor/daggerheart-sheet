@@ -15,20 +15,36 @@ import type { Strings } from "../i18n.js";
 // Letto una sola volta, in modo sincrono, al primo render (lazy initial
 // state) invece che in un useEffect al mount: evita un giro di render con
 // dati placeholder seguito da un re-render con i dati caricati.
-function loadInitialState(): { char: Character; currentId: string | null; status: StorageStatus } {
+function loadInitialState(): {
+  char: Character;
+  currentId: string | null;
+  status: StorageStatus;
+  lastSavedAt: number | null;
+} {
   const ptr = storageGet(LAST_OPENED_KEY);
   const id = ptr && ptr.value;
   if (id) {
     const res = storageGet(charKey(id));
     if (res && res.value) {
       try {
-        return { char: normalizeCharacter(JSON.parse(res.value)), currentId: id, status: "saved" };
+        const char = normalizeCharacter(JSON.parse(res.value));
+        let lastSavedAt: number | null = null;
+        const indexRes = storageGet(INDEX_KEY);
+        if (indexRes && indexRes.value) {
+          try {
+            const list: IndexEntry[] = JSON.parse(indexRes.value);
+            lastSavedAt = list.find((e) => e.id === id)?.updatedAt ?? null;
+          } catch {
+            /* indice corrotto: nessun orario da mostrare */
+          }
+        }
+        return { char, currentId: id, status: "saved", lastSavedAt };
       } catch {
         /* dati corrotti: si riparte da vuoto */
       }
     }
   }
-  return { char: initialCharacter(), currentId: null, status: "new" };
+  return { char: initialCharacter(), currentId: null, status: "new", lastSavedAt: null };
 }
 
 export function useCharacterSheet(t: Strings) {
@@ -36,6 +52,7 @@ export function useCharacterSheet(t: Strings) {
   const [char, setChar] = useState<Character>(initial.char);
   const [currentId, setCurrentId] = useState<string | null>(initial.currentId);
   const [status, setStatus] = useState<StorageStatus>(initial.status);
+  const [lastSavedAt, setLastSavedAt] = useState<number | null>(initial.lastSavedAt);
   const [showLoadPanel, setShowLoadPanel] = useState(false);
   const [savedList, setSavedList] = useState<IndexEntry[]>([]);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -82,6 +99,7 @@ export function useCharacterSheet(t: Strings) {
       if (result) {
         upsertIndexEntry(entryFor(currentId, char));
         setStatus("saved");
+        setLastSavedAt(Date.now());
       } else setStatus("error");
     }, 400);
     return () => {
@@ -150,6 +168,7 @@ export function useCharacterSheet(t: Strings) {
     setChar(initialCharacter());
     setCurrentId(null);
     setStatus("new");
+    setLastSavedAt(null);
     storageDelete(LAST_OPENED_KEY);
   };
 
@@ -165,6 +184,7 @@ export function useCharacterSheet(t: Strings) {
     storageSet(LAST_OPENED_KEY, id);
     if (!currentId) setCurrentId(id);
     setStatus("saved");
+    setLastSavedAt(Date.now());
   };
 
   const openLoadPanel = () => {
@@ -184,6 +204,7 @@ export function useCharacterSheet(t: Strings) {
         setChar(normalizeCharacter(JSON.parse(res.value)));
         setCurrentId(id);
         setStatus("saved");
+        setLastSavedAt(readIndex().find((e) => e.id === id)?.updatedAt ?? null);
         storageSet(LAST_OPENED_KEY, id);
       } catch {
         /* ignorato */
@@ -205,6 +226,7 @@ export function useCharacterSheet(t: Strings) {
       setChar(data);
       setCurrentId(id);
       setStatus("saved");
+      setLastSavedAt(Date.now());
       setShowLoadPanel(false);
     } catch {
       setStatus("error");
@@ -245,6 +267,7 @@ export function useCharacterSheet(t: Strings) {
     setChar(data);
     setCurrentId(id);
     setStatus("saved");
+    setLastSavedAt(Date.now());
     setShowLoadPanel(false);
   };
 
@@ -281,6 +304,7 @@ export function useCharacterSheet(t: Strings) {
       setChar(initialCharacter());
       setCurrentId(null);
       setStatus("new");
+      setLastSavedAt(null);
       storageDelete(LAST_OPENED_KEY);
     }
   };
@@ -297,6 +321,7 @@ export function useCharacterSheet(t: Strings) {
     char,
     currentId,
     status,
+    lastSavedAt,
     showLoadPanel,
     setShowLoadPanel,
     savedList,

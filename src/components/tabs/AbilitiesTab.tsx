@@ -7,10 +7,6 @@ import type { Strings } from "../../i18n.js";
 
 /* Il database delle carte ufficiali (fonte: Carte_Stampabili-Daggerheart_Set-Base_ITA.pdf)
    esiste solo in italiano: il picker è quindi disponibile solo con lang === "it". */
-const cardsByDomain = DOMAINS.map((domain) => ({
-  domain,
-  cards: DOMAIN_CARDS_IT.filter((c) => c.domain === domain),
-}));
 
 export function AbilitiesTab({
   t,
@@ -86,6 +82,11 @@ export function AbilitiesTab({
 
   const loadoutCards = char.domainCards.filter((c) => c.location === "loadout");
   const vaultCards = char.domainCards.filter((c) => c.location === "vault");
+
+  const cardsByDomain = domainOptions.map((domain) => ({
+    domain,
+    cards: DOMAIN_CARDS_IT.filter((c) => c.domain === domain),
+  }));
 
   const renderCardPicker = (location: DomainCardLocation) =>
     lang === "it" && (

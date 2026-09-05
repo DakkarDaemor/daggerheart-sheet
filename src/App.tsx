@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { CLASS_DOMAINS, SUBCLASSES } from "./data/gameData.js";
 import { PRESETS } from "./data/presets.js";
 import { STR } from "./i18n.js";
@@ -7,9 +7,17 @@ import { IdentityTab } from "./components/tabs/IdentityTab.js";
 import { TraitsTab } from "./components/tabs/TraitsTab.js";
 import { EquipTab } from "./components/tabs/EquipTab.js";
 import { AbilitiesTab } from "./components/tabs/AbilitiesTab.js";
-import type { Lang } from "./types.js";
+import { storageGet, storageSet, THEME_KEY } from "./storage.js";
+import type { Lang, Theme } from "./types.js";
 
 type TabKey = "identity" | "traits" | "equip" | "abilities";
+
+// Letto una sola volta, in modo sincrono, al primo render: evita un flash
+// del tema di default prima che la preferenza salvata venga applicata.
+function loadInitialTheme(): Theme {
+  const res = storageGet(THEME_KEY);
+  return res?.value === "light" ? "light" : "dark";
+}
 
 /* ---------------------------------------------------------------------
    APP PRINCIPALE
@@ -19,10 +27,19 @@ export function DaggerheartSheet() {
   const t = STR[lang];
   const [tab, setTab] = useState<TabKey>("identity");
   const [showActionMenu, setShowActionMenu] = useState(false);
+  const [theme, setTheme] = useState<Theme>(loadInitialTheme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    storageSet(THEME_KEY, theme);
+  }, [theme]);
+
+  const toggleTheme = () => setTheme((th) => (th === "dark" ? "light" : "dark"));
 
   const {
     char,
     status,
+    lastSavedAt,
     showLoadPanel,
     setShowLoadPanel,
     savedList,
@@ -81,7 +98,9 @@ export function DaggerheartSheet() {
           ? t.saving
           : status === "error"
             ? t.storageWarning
-            : t.saved;
+            : lastSavedAt
+              ? `${t.savedAt} ${new Date(lastSavedAt).toLocaleTimeString(lang)}`
+              : t.saved;
 
   return (
     <div className="dh-root">
@@ -99,6 +118,13 @@ export function DaggerheartSheet() {
               EN
             </button>
           </div>
+          <button
+            className="menu-btn"
+            aria-label={theme === "dark" ? t.switchToLightTheme : t.switchToDarkTheme}
+            onClick={toggleTheme}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
           <button
             className={`menu-btn ${showActionMenu ? "active" : ""}`}
             aria-label={t.actionsMenu}

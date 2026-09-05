@@ -89,14 +89,14 @@ describe("DaggerheartSheet", () => {
     const addButtons = () => screen.getAllByRole("button", { name: "+ Carta vuota" });
 
     await userEvent.click(addButtons()[0]!); // + Loadout
-    expect(screen.getByRole("button", { name: "→ Vault" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "→ Loadout" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "→ Riserva" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "→ Dotazione" })).not.toBeInTheDocument();
 
-    await userEvent.click(screen.getByRole("button", { name: "→ Vault" }));
-    expect(screen.getByRole("button", { name: "→ Loadout" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "→ Riserva" }));
+    expect(screen.getByRole("button", { name: "→ Dotazione" })).toBeInTheDocument();
 
     await userEvent.click(addButtons()[1]!); // + Vault
-    expect(screen.getAllByRole("button", { name: "→ Loadout" })).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "→ Dotazione" })).toHaveLength(2);
   });
 
   it("duplicates a saved character without touching the one currently open", async () => {
